@@ -1,0 +1,8 @@
+// SC-200 Lab 2 - Impossible Travel
+// Detects same user login from multiple countries in 10 min
+SigninLogs
+| where ResultType == 0
+| extend Country = tostring(LocationDetails.countryOrRegion)
+| where isnotempty(Country)
+| summarize CountryCount = dcount(Country), Countries = make_set(Country) by UserPrincipalName, bin(TimeGenerated, 10m)
+| where CountryCount > 1
