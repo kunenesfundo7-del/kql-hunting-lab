@@ -1,53 +1,5 @@
-// SC-200 Lab 2 - Impossible Travel
-// Detects same user login from multiple countries in 10 min
 SigninLogs
-| where ResultType == 0
-| extend Country = tostring(LocationDetails.countryOrRegion)
+| where Result == 0
 | where isnotempty(Country)
 | summarize CountryCount = dcount(Country), Countries = make_set(Country) by UserPrincipalName, bin(TimeGenerated, 10m)
 | where CountryCount > 1
-
-# Incident 02 - Impossible Travel Analytics Rule (SC-200 Lab)
-
-**ID:** 2 | **Severity:** High | **Priority:** 1 | **Status:** Active
-**Rule:** Impossible Travel - Multiple Countries in 10m - LAB
-**Workspace:** sc200-law | **Service Source:** Microsoft Sentinel
-**Date:** Oct 16, 2026 | **Location:** Germiston, SA
-
-### Attack Story
-- **12 Alerts** aggregated into single incident
-- **Activities:** 13 (First: 10:21 AM - Last: 10:38 AM)
-- **Tactic:** Identity - Initial Access / Impossible Travel
-- **User:** `admin@sc200lablearning.onmicrosoft.com` (Sfundo Kunene)
-
-### The Lab Blocker (Real Troubleshooting)
-
-**Error:** Analytics Rule Wizard failed validation on Review + Create - Red X
-
-
-**Root Cause:** Entity Mapping pointing to columns that don't exist in query output.
-
-Query returned: `UserPrincipalName, Country, count_`
-Mapping was: `AccountCustomEntity / IPCustomEntity` (template error)
-
-**Fix:**
-In `Set rule logic > Entity mapping > Alert Details`:
-1. Account Entity: Identifier `Name` -> Value `UserPrincipalName` (not AccountCustomEntity)
-2. Deleted IP Entity row (no IP in this query version)
-
-Final mapping:
-
-After fix - Validation passed, rule saved, incident auto-generated.
-
-### KQL Used
-
-```kql
-SigninLogs
-| where TimeGenerated > ago(1h)
-| where ResultType == 0
-| extend Country = tostring(LocationDetails.countryOrRegion)
-| where isnotempty(Country)
-| summarize CountryCount = dcount(Country), Countries = make_set(Country) by UserPrincipalName, bin(TimeGenerated, 10m)
-| where CountryCount > 1
-
-
