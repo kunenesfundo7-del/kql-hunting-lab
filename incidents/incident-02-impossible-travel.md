@@ -34,4 +34,4 @@ MFA Type: Authenticator push / Software OTP
 This is why Impossible Travel was possible.
 
 ### Evidence
-![MFA Disabled Asset Panel](../images/impossible-travel-asset-mfa-disabled.jpg)
+![MFA Disabled Asset Panel](../images/impossible-travel-asset-mfa-disabled.png) 
