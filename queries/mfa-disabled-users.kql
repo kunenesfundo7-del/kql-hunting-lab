@@ -1,0 +1,4 @@
+SigninLogs
+| where UserPrincipalName contains "sc200"
+| summarize LastSignIn = max(TimeGenerated), Locations = make_set(Location), IPList = make_set(IPAddress) by UserPrincipalName
+| project UserPrincipalName, LastSignIn, Locations, IPList
