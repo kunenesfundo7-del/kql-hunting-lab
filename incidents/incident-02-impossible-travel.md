@@ -1,37 +1,39 @@
-# Incident 02 - Impossible Travel - Multiple Countries in 10m - LAB
+# Incident 02 - Impossible Travel Detection
 
-**ID:** 2 | **Severity:** High | **Status:** Active
-**Rule:** Impossible Travel - Multiple Countries in 10m - LAB
-**Workspace:** sc200-law | **Service Source:** Microsoft Sentinel
-**Date:** Oct 16, 2026 | **Location:** Germiston, SA
+**Date:** 2026-10-17
+**Analyst:** Sfundo (Germiston, ZA)
+**Status:** No Threat Found - Baseline Validated
 
-### Attack Story
-- **12 Alerts** aggregated into single incident (now 70 alerts / 71 activities)
-- **Activities:** First: 10:21 AM - Last: 4:26 PM
-- **Tactic:** Identity - Initial Access / Impossible Travel
-- **User:** admin@sc200lablearning.onmicrosoft.com (Sfundo Kunene)
+**Hunt Objective:** Detect impossible travel / credential theft for solo lab user
 
-### The Lab Blocker (Real Troubleshooting)
+**Baseline (Known Good - Proven in Incident 03):**
+- User: admin@sc200lablearning.onmicrosoft.com
+- Legit Location: ZA - Germiston, South Africa
+- Legit IP: 41.24.136.73
+- Legit Time: 2026-10-17 17:52
+- Lab Type: Solo - 1 user only
 
-**Error:** Analytics Rule Wizard failed validation on Review + Create - Red X
+**KQL Query File:** queries/impossible-travel.kql
 
-**Root Cause:** Entity Mapping pointing to columns that don't exist in query output.
-Query returned: UserPrincipalName, Country, count_
-Mapping was: AccountCustomEntity / IPCustomEntity (template error)
+**Query Logic:**
+1. Filter successful logins (Result == 0) for sc200 user
+2. Require Location and IPAddress not empty
+3. Summarize by User + 1h bin: dcount(Country), make_set(Countries, Locations, IPs)
+4. Trigger when CountryCount > 1
+5. Add Risk field: flag travel originating from ZA
 
-**Fix:**
-In Set rule logic > Entity mapping > Alert Details:
-1. Account Entity: Identifier Name -> Value UserPrincipalName (not AccountCustomEntity)
-2. Deleted IP Entity row (no IP in this query version)
-
-Final mapping:
-- UserPrincipalName = Account Entity
-- Country = Geo Location
-
-### Key Finding from Asset Panel
-MFA Status: Disabled
-MFA Type: Authenticator push / Software OTP
-This is why Impossible Travel was possible.
-
-### Evidence
-![MFA Disabled Asset Panel](../images/impossible-travel-asset-mfa-disabled.png) 
+**KQL:**
+```kql
+SigninLogs
+| where Result == 0
+| where UserPrincipalName contains "sc200"
+| where isnotempty(Location) and isnotempty(IPAddress)
+| summarize 
+    CountryCount = dcount(Country),
+    Countries = make_set(Country),
+    Locations = make_set(Location),
+    IPs = make_set(IPAddress),
+    LastSeen = max(TimeGenerated)
+    by UserPrincipalName, bin(TimeGenerated, 1h)
+| where CountryCount > 1
+| extend Risk = iff(Countries has "ZA", "Possible Travel from ZA", "Foreign Login")
