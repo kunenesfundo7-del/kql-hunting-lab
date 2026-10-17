@@ -1,5 +1,18 @@
+// Impossible Travel Hunt - SC200 Lab
+// Baseline: Legit location = ZA [41.24.136.73] - Germiston, SA
+// Hunt Logic: 2 different countries within 60m = suspicious
 SigninLogs
 | where Result == 0
-| where isnotempty(Country)
-| summarize CountryCount = dcount(Country), Countries = make_set(Country) by UserPrincipalName, bin(TimeGenerated, 10m)
+| where UserPrincipalName contains "sc200"
+| where isnotempty(Location) and isnotempty(IPAddress)
+| summarize 
+    CountryCount = dcount(Country),
+    Countries = make_set(Country),
+    Locations = make_set(Location),
+    IPs = make_set(IPAddress),
+    LastSeen = max(TimeGenerated)
+    by UserPrincipalName, bin(TimeGenerated, 1h)
 | where CountryCount > 1
+| extend Risk = iff(Countries has "ZA", "Possible Travel from ZA", "Foreign Login")
+// If you want STRICT: hunt only when NOT ZA
+// | where Countries !has "ZA"
