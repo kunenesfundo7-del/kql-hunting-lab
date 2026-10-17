@@ -1,7 +1,7 @@
 # KQL Hunting Lab - SC-200 Preparation
 
-**Candidate:** SOC Analyst | SC-200 | Germiston, SA 
-**Workspace:** sc200-law (Microsoft Sentinel)
+**Candidate:** SOC Analyst | SC-200 | Germiston, SA  
+**Workspace:** sc200-law (Microsoft Sentinel) 
 **Lab Environment (Live Proven):**
 - Location: ZA - Germiston, South Africa (41.24.136.73)
 - User: admin@sc200lablearning.onmicrosoft.com
