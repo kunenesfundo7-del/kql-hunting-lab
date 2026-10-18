@@ -1,0 +1,7 @@
+SigninLogs
+| where TimeGenerated > ago(14d)
+| where ConditionalAccessStatus == "failure" or ResultType != 0
+| extend FailureReason = tostring(ResultDescription)
+| project TimeGenerated, UserPrincipalName, AppDisplayName, IPAddress, Location, ConditionalAccessStatus, ResultType, FailureReason
+| order by TimeGenerated desc
+| limit 20
