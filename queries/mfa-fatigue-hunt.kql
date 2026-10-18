@@ -1,0 +1,9 @@
+// Hunt 04 - MFA Fatigue Proactive Hunt - SC200
+// Candidate: Sfundo - Germiston, SA
+// Workspace: sc200-law
+SigninLogs
+| where ResultType in (500121, 500123, 50074)
+| where TimeGenerated > ago(7d)
+| summarize FailedCount=count(), IPList=make_set(IPAddress) by UserPrincipalName, bin(TimeGenerated, 10m)
+| where FailedCount >= 3
+| order by FailedCount desc
