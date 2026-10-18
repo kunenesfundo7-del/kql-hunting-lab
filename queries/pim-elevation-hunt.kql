@@ -1,0 +1,7 @@
+AuditLogs
+| where TimeGenerated > ago(14d)
+| where OperationName contains "Add member to role" or OperationName contains "PIM"
+| extend PIMUser = tostring(TargetResources[0].userPrincipalName)
+| extend RoleName = tostring(TargetResources[0].displayName)
+| project TimeGenerated, PIMUser, RoleName, OperationName, InitiatedBy = tostring(InitiatedBy.user.userPrincipalName)
+| order by TimeGenerated desc
