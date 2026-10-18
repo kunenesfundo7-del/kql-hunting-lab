@@ -1,0 +1,22 @@
+// Hunt 06 - Conditional Access Failure RCA
+// Role: Cyber Security Engineer Financial Services JHB - Triage MFA + Conditional Access tickets
+// Framework: Zero Trust, NIST PR.AC-1, CIS 5.2, POPIA Sec 19
+
+SigninLogs
+| where ResultType == 53003 or ResultType == 50005 or ResultType == 50105
+| where TimeGenerated > ago(7d)
+| extend FailureReason = case(
+    ResultType == 53003, "Blocked by Conditional Access",
+    ResultType == 50005, "Device Policy Failure",
+    ResultType == 50105, "Sign-in was blocked - locked device",
+    "Other")
+| project TimeGenerated, UserPrincipalName, AppDisplayName, IPAddress, Location, FailureReason, ConditionalAccessStatus, ResultDescription, ResultType
+| order by TimeGenerated desc
+| limit 20
+
+// Second query - Correlate with PIM elevation (JIT)
+| join kind=leftouter (
+    AuditLogs
+    | where OperationName contains "PIM" or OperationName contains "Add member to role"
+    | project PIMTime = TimeGenerated, PIMUser = tostring(TargetResources[0].userPrincipalName), OperationName
+) on $left.UserPrincipalName == $right.PIMUser
