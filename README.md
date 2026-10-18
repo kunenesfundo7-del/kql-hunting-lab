@@ -29,3 +29,5 @@ This repo documents my KQL hunting queries for Microsoft Sentinel, focusing on r
 - **Impact:** 45 sign-ins with no CA policy evaluated - CIS 6.5, Zero Trust gap
 
 **Lab Provenance:** Workspace sc200-law, User admin@sc200lablearning.onmicrosoft.com, IP 41.24.136.73 Germiston ZA, Live queries with screenshots.
+
+- *Hunt 08:* BYOD Cross-Device ✅ Windows10 + Android | sc200-law | Germiston 41.24.136.73
