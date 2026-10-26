@@ -48,5 +48,8 @@ This repo documents my KQL hunting queries for Microsoft Sentinel, focusing on r
 **Queries:** See `queries/Hunt10-AddMemberToGroup-Fix.kql`
 **Screenshots:**
 ![Failure](images/Hunt10-FAILURE-M365Group.png)
-![Success](Hunt10-SUCCESS-SecurityGroup-MITRE.png)
+
+
+![Success](images/Hunt10-SUCCESS-SecurityGroup-MITRE.png)
+
 
