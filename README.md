@@ -47,5 +47,6 @@ This repo documents my KQL hunting queries for Microsoft Sentinel, focusing on r
 - T1098 Account Manipulation
 **Queries:** See `queries/Hunt10-AddMemberToGroup-Fix.kql`
 **Screenshots:**
-![Failure vs Success](images/Hunt10-AddMemberToGroup-Success-MITRE.png)
+![Failure](images/Hunt10-FAILURE-M365Group.png)
+![Success](Hunt10-SUCCESS-SecurityGroup-MITRE.png)
 
