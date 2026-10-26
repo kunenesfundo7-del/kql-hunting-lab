@@ -32,3 +32,20 @@ This repo documents my KQL hunting queries for Microsoft Sentinel, focusing on r
 
 - *Hunt 08:* BYOD Cross-Device ✅ Windows10 + Android | sc200-law | Germiston 41.24.136.73
 - *Hunt 09:* Threat Intel ✅ Vodacom Mobile IP 0% Abuse | Johannesburg | CGNAT explained
+
+## Hunt 10 - Fix: Add Member to Group Failure -> Success
+**Problem:** AuditLogs showed `Result: failure` for `Add member to group` at 17:15. Only 8 logs.
+**Root Cause:** Used Microsoft 365 group type. Free trial blocks member adds — need Security + Assigned.
+**Fix:** Created Security group `Demo-Security-Group` with Assigned membership. New log at 18:57 shows `Result: success`.
+**KQL Learning:**
+- `TargetResources[0]` = first box (Group)
+- `TargetResources[1]` = second box (Member/User)
+- `tostring()` unwraps JSON to readable text
+- Member = User in this lab
+**MITRE:**
+- TA0003 Persistence - User added to group for continued access
+- T1098 Account Manipulation
+**Queries:** See `queries/Hunt10-AddMemberToGroup-Fix.kql`
+**Screenshots:**
+![Failure vs Success](images/Hunt10-AddMemberToGroup-Success-MITRE.png)
+
