@@ -30,22 +30,82 @@ This repo documents my KQL hunting queries for Microsoft Sentinel, focusing on r
 
 **Lab Provenance:** Workspace sc200-law, User admin@sc200lablearning.onmicrosoft.com, IP 41.24.136.73 Germiston ZA, Live queries with screenshots.
 
-- *Hunt 08:* BYOD Cross-Device ✅ Windows10 + Android | sc200-law | Germiston 41.24.136.73
-- *Hunt 09:* Threat Intel ✅ Vodacom Mobile IP 0% Abuse | Johannesburg | CGNAT explained
+kql-hunting-lab
+Microsoft Sentinel KQL Hunting Lab — SC200 Preparation
+Lab Provenance
+Workspace: sc200-law  
+Tenant: Trial tenant (SC200 Lab)  
+Focus: Live KQL queries with screenshots for SOC Analyst preparation
+Hunts Overview
+Hunt 08: BYOD Cross-Device ✅ Windows10 + Android | sc200-law
+Hunt 09: Threat Intel ✅ Vodacom Mobile IP 0% Abuse | Johannesburg | CGNAT explained
+---
+Hunt 10 - Fix: Add Member to Group Failure -> Success
+Problem: AuditLogs showed `Result: failure` for `Add member to group` at 17:15. Only 8 logs.
+Root Cause: Used Microsoft 365 group type. Free trial blocks member adds — need Security + Assigned.
+Fix: Created Security group `Demo-Security-Group` with Assigned membership. New log at 18:57 shows `Result: success`.
+KQL Learning:
+`TargetResources[0]` = first box (Group)
+`TargetResources[1]` = second box (Member/User)
+`tostring()` unwraps JSON to readable text
+Member = User in this lab
+MITRE ATT&CK:
+TA0003 Persistence - User added to group for continued access
+T1098 Account Manipulation - Group membership change
+Queries
+See: `queries/Hunt10-AddMemberToGroup-Fix.kql`
+```kql
+// Query 1 - Basic AuditLogs
+AuditLogs
+| where TimeGenerated > ago(7d)
+| extend Actor = tostring(InitiatedBy.user.userPrincipalName)
+| extend Target = tostring(TargetResources[0].displayName)
+| project TimeGenerated, OperationName, Actor, Target, Result
+| sort by TimeGenerated desc
 
-## Hunt 10 - Fix: Add Member to Group Failure -> Success
-**Problem:** AuditLogs showed `Result: failure` for `Add member to group` at 17:15. Only 8 logs.
-**Root Cause:** Used Microsoft 365 group type. Free trial blocks member adds — need Security + Assigned.
-**Fix:** Created Security group `Demo-Security-Group` with Assigned membership. New log at 18:57 shows `Result: success`.
-**KQL Learning:**
-- `TargetResources[0]` = first box (Group)
-- `TargetResources[1]` = second box (Member/User)
-- `tostring()` unwraps JSON to readable text
-- Member = User in this lab
-**MITRE:**
-- TA0003 Persistence - User added to group for continued access
-- T1098 Account Manipulation
-**Queries:** See `queries/Hunt10-AddMemberToGroup-Fix.kql`
+// Query 2 - Fixed Group Query
+AuditLogs
+| where TimeGenerated > ago(30m)
+| where OperationName == "Add member to group"
+| extend Actor = tostring(InitiatedBy.user.userPrincipalName)
+| extend GroupName = tostring(TargetResources[0].displayName)
+| extend Member = tostring(TargetResources[1].displayName)
+| project TimeGenerated, OperationName, Actor, GroupName, Member, Result
+
+// Query 3 - MITRE Mapping
+AuditLogs
+| where TimeGenerated > ago(30m)
+| where OperationName == "Add member to group"
+| extend Actor = tostring(InitiatedBy.user.userPrincipalName)
+| extend GroupName = tostring(TargetResources[0].displayName)
+| extend Member = tostring(TargetResources[1].displayName)
+| extend MITRE_Tactic = "TA0003 - Persistence"
+| extend MITRE_Technique = "T1098 - Account Manipulation"
+| project TimeGenerated, OperationName, Actor, GroupName, Member, Result, MITRE_Tactic, MITRE_Technique
+```
+Screenshots
+Before — Failure (Microsoft 365 Group):
+Failure
+After — Success + MITRE (Security Group):
+Success
+---
+Skills Demonstrated
+Microsoft Sentinel / Log Analytics
+KQL: where, extend, project, tostring, TargetResources[0]/[1], sort
+Entra ID Groups: Security vs Microsoft 365, Assigned vs Dynamic
+MITRE ATT&CK: TA0003 Persistence, TA0004 Privilege Escalation, T1098 Account Manipulation
+Troubleshooting: Diagnosed failure from AuditLogs Result field
+Repo Structure
+```
+kql-hunting-lab/
+├── images/
+│   ├── Hunt10-FAILURE-M365Group.png
+│   └── Hunt10-SUCCESS-SecurityGroup-MITRE.png
+├── queries/
+│   └── Hunt10-AddMemberToGroup-Fix.kql
+├── incidents/
+└── README.md
+```
 **Screenshots:**
 ![Failure](images/Hunt10-FAILURE-M365Group.png)
 
