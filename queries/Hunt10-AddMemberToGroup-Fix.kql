@@ -1,0 +1,27 @@
+// Query 1 - Basic AuditLogs
+AuditLogs
+| where TimeGenerated > ago(7d)
+| extend Actor = tostring(InitiatedBy.user.userPrincipalName)
+| extend Target = tostring(TargetResources[0].displayName)
+| project TimeGenerated, OperationName, Actor, Target, Result
+| sort by TimeGenerated desc
+ 
+// Query 2 - Fixed Group Query
+AuditLogs
+| where TimeGenerated > ago(30m)
+| where OperationName == "Add member to group"
+| extend Actor = tostring(InitiatedBy.user.userPrincipalName)
+| extend GroupName = tostring(TargetResources[0].displayName)
+| extend Member = tostring(TargetResources[1].displayName)
+| project TimeGenerated, OperationName, Actor, GroupName, Member, Result
+
+// Query 3 - MITRE Mapping
+AuditLogs
+| where TimeGenerated > ago(30m)
+| where OperationName == "Add member to group"
+| extend Actor = tostring(InitiatedBy.user.userPrincipalName)
+| extend GroupName = tostring(TargetResources[0].displayName)
+| extend Member = tostring(TargetResources[1].displayName)
+| extend MITRE_Tactic = "TA0003 - Persistence"
+| extend MITRE_Technique = "T1098 - Account Manipulation"
+| project TimeGenerated, OperationName, Actor, GroupName, Member, Result, MITRE_Tactic, MITRE_Technique
