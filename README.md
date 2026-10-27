@@ -112,3 +112,16 @@ kql-hunting-lab/
 ├── incidents/
 └── README.md
 ```
+
+### Analytics - Production Rules
+
+**Folder:** `analytics/`  
+**Rules Enabled:** 4  
+- SOC-Hunt10 - Persistence - Member Added to Group (TA0003, T1098) - Enabled ✅
+- HUNT - Non-Interactive Logins - Enabled ✅
+- Brute Force - 5 failed logins - Enabled ✅
+- Impossible Travel - Enabled ✅
+
+**Screenshots:** `analytics/Hunt10-Active-Rules.png`
+
+This proves I can turn KQL hunting into production SOC detections.
