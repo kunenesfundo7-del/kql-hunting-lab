@@ -125,3 +125,13 @@ kql-hunting-lab/
 **Screenshots:** `analytics/Hunt10-Active-Rules.png`
 
 This proves I can turn KQL hunting into production SOC detections.
+
+
+### Incident 25 - Non-Interactive Sign-In Anomaly
+**ID:** 25 | **Severity:** Medium | **Status:** Active  
+**Detection:** HUNT - Non-Interactive Sign-In Anomaly - _100/hr  
+**MITRE:** TA0001 Initial Access, TA0006 Credential Access  
+**Details:** `incidents/Incident25.md`  
+**Screenshot:** `images/Incident25-NonInteractive-Anomaly-SAFE.png`
+Analytic rule triggered on 100/hr non-interactive logins (service principal spike). Real SOC incident from my 4 active rules in sc200-law.
+
